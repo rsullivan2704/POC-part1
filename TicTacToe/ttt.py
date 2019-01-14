@@ -40,7 +40,16 @@ def mc_update_scores(scores, board, player):
           scores[row_idx][col_idx] -= (factor * SCORE_OTHER)
     
 def get_best_move(board, scores):
-  pass
+  empties = board.get_empty_squares()
+  max_score = 0
+  for empty_square in empties:
+    current_max = board[empty_square[0]][empty_square[1]]
+    if current_max > max_score:
+      max_score == current_max
+  while len(empties) > 0:
+    random_square = empties.pop(random.randrange(0, len(empties)))
+    if board[random_square[0]][random_square[1]] == max_score:
+      return random_square
     
 def mc_move(board, player, trials):  
   pass
