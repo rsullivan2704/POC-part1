@@ -29,7 +29,7 @@ def mc_trial(board, player):
     
 def mc_update_scores(scores, board, player):
   factor = 1
-  if board.check_win() == player:
+  if board.check_win() != player:
     factor = -1
   for row_idx, row in enumerate(board):
     for col_idx, square in enumerate(row):
