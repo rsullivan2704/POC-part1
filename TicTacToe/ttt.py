@@ -9,8 +9,8 @@ import random
 # Constants for Monte Carlo simulator
 # You may change the values of these constants as desired, but
 #  do not change their names.
-NTRIALS = 1         # Number of trials to run
-SCORE_CURRENT = 1.0 # Score for squares played by the current player
+NTRIALS = 100       # Number of trials to run
+SCORE_CURRENT = 2.0 # Score for squares played by the current player
 SCORE_OTHER = 1.0   # Score for squares played by the other player
     
 # Add your functions here.
@@ -42,8 +42,9 @@ def mc_update_scores(scores, board, player):
       # negate the factor so in effect the score is deducted
       # if the machine player is not the winner
       factor = -1
-    for row_idx, row in enumerate(board):
-      for col_idx, square in enumerate(row):
+    for row_idx in range(board.get_dim()):
+      for col_idx in range(board.get_dim()):
+        square = board.square(row_idx, col_idx)
         if square != provided.EMPTY:
           if square == player:
             scores[row_idx][col_idx] += (factor * SCORE_CURRENT)
@@ -55,16 +56,13 @@ def get_best_move(board, scores):
   Randomly return the best move based on the scores provided.
   '''
   empties = board.get_empty_squares()
-  max_score = 0
-  #maximum = [max(scores[empty_square[0]][empty_square[1]]) for empty_square in empties]
-  for empty_square in empties:
-    current_max = scores[empty_square[0]][empty_square[1]]
-    if current_max > max_score:
-      max_score == current_max
+  if empties == None:
+    return (0, 0)
+  max_score = max([scores[empty_square[0]][empty_square[1]] for empty_square in empties])
   while len(empties) > 0:
-    random_square = empties.pop(random.randrange(0, len(empties)))
-    if scores[random_square[0]][random_square[1]] == max_score:
-      return random_square
+    random_empty = empties.pop(random.randrange(0, len(empties)))
+    if scores[random_empty[0]][random_empty[1]] == max_score:
+      return random_empty
     
 def mc_move(board, player, trials):  
   '''
@@ -73,10 +71,13 @@ def mc_move(board, player, trials):
   '''
   scores = [[0 for dummycol in range(board.get_dim())]
             for dummyrow in range(board.get_dim())]
-  for trial in range(trials):
+  trial = 0
+  while trial < trials:
+  #for trial in range(trials):
     trial_board = board.clone()
     mc_trial(trial_board, player)
-    mc_update_scores(scores, board, player)
+    mc_update_scores(scores, trial_board, player)
+    trial += 1
   return get_best_move(board, scores)
 
 
