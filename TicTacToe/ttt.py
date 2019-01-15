@@ -56,6 +56,7 @@ def get_best_move(board, scores):
   '''
   empties = board.get_empty_squares()
   max_score = 0
+  #maximum = [max(scores[empty_square[0]][empty_square[1]]) for empty_square in empties]
   for empty_square in empties:
     current_max = scores[empty_square[0]][empty_square[1]]
     if current_max > max_score:
