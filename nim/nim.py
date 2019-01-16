@@ -4,22 +4,38 @@ http://en.wikipedia.org/wiki/Nim#The_21_game
 """
 
 import random
-import codeskulptor
-codeskulptor.set_timeout(20)
+# import codeskulptor
+# codeskulptor.set_timeout(20)
 
 MAX_REMOVE = 3
 TRIALS = 10000
 
+def nim_trial(num_items):
+  is_comp_player = True
+  sequence = []
+  while num_items > 0:
+    random_remove = random.randrange(1, MAX_REMOVE + 1)
+    sequence.append((is_comp_player, random_remove))
+    num_items -= random_remove
+    is_comp_player = not is_comp_player
+  return sequence
+
 def evaluate_position(num_items):
   """
   Monte Carlo evalation method for Nim
-  """
-  
-  while num_items > 0:
-    random_remove = random.randrange(1, MAX_REMOVE + 1)
-    
-  
-  return 0
+  """  
+  trial = 0
+  scores = []
+  while trial < TRIALS:
+    game_result = nim_trial(num_items)
+    if game_result[-1][0] == True:
+      # the comp player won the simulation
+      # add the value initially chosen
+      scores.append(game_result[0][1])
+    trial += 1
+  moves = {value:scores.count(value) for value in scores}
+  move = max(moves, key=moves.get)
+  return move
 
 
 def play_game(start_items):
@@ -36,7 +52,7 @@ def play_game(start_items):
     if current_items <= 0:
       print "Computer wins"
       break
-    player_move = int(input("Enter your current move"))
+    player_move = int(input("Enter your current move: "))
     current_items -= player_move
     print "Player choose", player_move, ", current value is", current_items
     if current_items <= 0:
