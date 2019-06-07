@@ -1,12 +1,14 @@
 import math
 import fractions
 
+
 def enums(set_size, output_length):
     '''
     Returns the number of possible enumerations, including duplicates, for
     a given set of size set_size, with an output of size output_length
     '''
-    return set_size ** output_length
+    return set_size**output_length
+
 
 def enums_no_dupes(set_size, output_length):
     '''
@@ -15,14 +17,16 @@ def enums_no_dupes(set_size, output_length):
     '''
     # Calculated using the formula:
     # (output_length + set_size - 1)! / output_length! * (set_size - 1)!
-    return math.factorial(output_length + set_size - 1) / (math.factorial(output_length) * math.factorial(set_size - 1))
+    return math.factorial(output_length + set_size - 1) / (
+        math.factorial(output_length) * math.factorial(set_size - 1))
+
 
 def perms(set_size, output_length):
     '''
     Returns the number of possible permutations for
     a set of size set_size, with an output size of output_length
     '''
-    # Calculated by dividing the factorial of the set_size 
+    # Calculated by dividing the factorial of the set_size
     # by the factorial of the output_length
     # (set_size! / output_length!)
     # Since there are terms that cancel out up to (set_size - output_length)
@@ -33,17 +37,19 @@ def perms(set_size, output_length):
         num_perms *= idx
     return num_perms
 
+
 def combos(set_size, output_length):
     '''
     Returns the number of possible combinations for
     a set of size set_size, with an output size of output_length
     '''
-    # Calculated by dividing the factorial of the set_size 
+    # Calculated by dividing the factorial of the set_size
     # by the factorial of the output_length multiplied by
     # the factorial of the set_size
     # set_size! / (output_length! * set_size!)
     num_perms = perms(set_size, output_length)
     return num_perms / math.factorial(output_length)
+
 
 def subsets(set_size):
     '''
@@ -56,11 +62,12 @@ def subsets(set_size):
         subset_count += combinations
     return subset_count
 
+
 def gen_all_sequences(outcomes, length):
     """
     Iterative function that enumerates the set of all sequences of
     outcomes of given length
-    """    
+    """
     ans = set([()])
     for dummy_idx in range(length):
         temp = set()
@@ -72,21 +79,23 @@ def gen_all_sequences(outcomes, length):
         ans = temp
     return ans
 
+
 def gen_sorted_sequences(outcomes, length):
     """
     Function that creates all sorted sequences via gen_all_sequences
-    """    
+    """
     all_sequences = gen_all_sequences(outcomes, length)
     sorted_sequences = [tuple(sorted(sequence)) for sequence in all_sequences]
     return set(sorted_sequences)
+
 
 def gen_permutations(outcomes, length):
     """
     Iterative function that generates set of permutations of
     outcomes of length num_trials
     No repeated outcomes allowed
-    """    
-    ans = set([()])    
+    """
+    ans = set([()])
     # add code here
     for dummy_idx in range(length):
         temp = set()
@@ -97,8 +106,9 @@ def gen_permutations(outcomes, length):
                 new_seq = list(seq)
                 new_seq.append(item)
                 temp.add(tuple(new_seq))
-        ans = temp    
+        ans = temp
     return ans
+
 
 def gen_combinations(outcomes, length):
     '''
@@ -110,9 +120,12 @@ def gen_combinations(outcomes, length):
     # sort the permutations so we can eliminate duplicates
     # (ie ('a', 'b') & ('b', 'a')) since they represent
     # the same combination of values
-    sorted_permutations = [tuple(sorted(sequence)) for sequence in permutations]
+    sorted_permutations = [
+        tuple(sorted(sequence)) for sequence in permutations
+    ]
     # eliminate the duplicates by placing the sorted list into a set
     return set(sorted_permutations)
+
 
 def gen_subsets(outcomes):
     subsets = []
@@ -120,27 +133,34 @@ def gen_subsets(outcomes):
         subsets.append(gen_combinations(outcomes, length))
     return subsets
 
+
 def pascals_triangle(row, cell):
     '''
     Returns the value of the given cell
     in the given row of Pascal's triangle
     '''
-    return math.factorial(row) / (math.factorial(cell) * math.factorial(abs(row - cell)))
+    return math.factorial(row) / (math.factorial(cell) *
+                                  math.factorial(abs(row - cell)))
 
-print enums(2, 2)
-sequences = gen_all_sequences([1, 2], 2)
-print 'sequences =', sequences
-print 'len(sequences) =', len(sequences)
+
+# print enums(2, 2)
+# sequences = gen_all_sequences([1, 2], 2)
+# print 'sequences =', sequences
+# print 'len(sequences) =', len(sequences)
 
 # Final example for homework problem
 
-outcome = set(["a", "b", "c", "d", "e", "f"])
+# outcome = set(["a", "b", "c", "d", "e", "f"])
 
-permutations = gen_permutations(outcome, 4)
-permutation_list = list(permutations)
-permutation_list.sort()
-print
-print "Answer is", permutation_list[100]
+# permutations = gen_permutations(outcome, 4)
+# permutation_list = list(permutations)
+# permutation_list.sort()
+# print permutation_list
+# print "Answer is", permutation_list[100]
+
+outcome = set(['a', 'b', 'c'])
+permutations = gen_permutations(outcome, 3)
+print permutations
 
 # print
 # print 'pascals_triangle(row=1, cell=1):', pascals_triangle(1, 1)
@@ -170,9 +190,9 @@ print "Answer is", permutation_list[100]
 # print
 # outcome = set([1, 2])
 # all_sequences = gen_all_sequences(outcome, len(outcome))
-# print 
+# print
 # print 'subsets(len(outcome)):', subsets(len(outcome))
-# print 
+# print
 # print 'gen_subsets(outcome):', gen_subsets(outcome)
 # print
 # outcome = set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
