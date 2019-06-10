@@ -1,7 +1,5 @@
 import poc_simpletest
 import yahtzee_planner
-import math
-
 
 def run_suite(yahtzee_imp):
     '''
@@ -61,7 +59,7 @@ def run_suite(yahtzee_imp):
     strat = yahtzee_imp.strategy((1, ), 6)
 
     suite.run_test((round(strat[0], 8), strat[1]),
-                   (round(11.3095238095, 8), (6, )),
+                   (round(11.3095238095, 8), ()),
                    'Test#11: strategy(held_dice = (1, ), num_die_sides = 6)')
 
     suite.report_results()

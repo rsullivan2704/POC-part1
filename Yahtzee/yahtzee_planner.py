@@ -25,6 +25,32 @@ def gen_all_sequences(outcomes, length):
         answer_set = temp_set
     return answer_set
 
+def gen_sorted_sequences(outcomes, length):
+    all_sequences = gen_all_sequences(outcomes, length)
+    sorted_sequences = [tuple(sorted(sequence)) for sequence in all_sequences]
+    return set(sorted_sequences)
+
+
+def gen_permutations(outcomes, length):
+    answer_set = set([()])
+    for dummy_idx in range(length):
+        temp_set = set()
+        for partial_sequence in answer_set:
+            for item in outcomes:
+                if item in partial_sequence:
+                    continue
+                new_sequence = list(partial_sequence)
+                new_sequence.append(item)
+                temp_set.add(tuple(new_sequence))
+        answer_set = temp_set
+    return answer_set
+
+
+def gen_combinations(outcomes, length):
+    permutations = gen_permutations(outcomes, length)
+    sorted_permutations = [tuple(sorted(sequence)) for sequence in permutations]
+    return set(sorted_permutations)
+
 
 def score(hand):
     """
@@ -102,13 +128,36 @@ def run_example():
     """
     Compute the dice to hold and expected score for an example hand
     """
-    num_die_sides = 6
-    hand = (1, 1, 1, 5, 6)
-    hand_score, hold = strategy(hand, num_die_sides)
-    print "Best strategy for hand", hand, "is to hold", hold, "with expected score", hand_score
+    outcomes = (1, 1, 2)
+
+    seqs = set()
+    for idx in range(len(outcomes)):
+        seqs.update(gen_all_sequences(outcomes, idx))
+    seqs.add(outcomes)
+    print 'seqs:', sorted(seqs)
+
+    sort_seqs = set()
+    sort_seqs.add(outcomes)
+    for idx in range(len(outcomes)):
+        sort_seqs.update(gen_sorted_sequences(outcomes, idx))
+    print 'sort_seqs:', sorted(sort_seqs)
+
+    perms = set()
+    for idx in range(len(outcomes)):
+        perms.update(gen_permutations(outcomes, idx))
+    print 'perms:', sorted(perms)
+
+    combos = set()
+    for idx in range(len(outcomes)):
+        combos.update(gen_combinations(outcomes, idx))
+    print 'combos:', sorted(combos)
+    # num_die_sides = 6
+    # hand = (1, 1, 1, 5, 6)
+    # hand_score, hold = strategy(hand, num_die_sides)
+    # print "Best strategy for hand", hand, "is to hold", hold, "with expected score", hand_score
 
 
-# run_example()
+run_example()
 
 # import poc_holds_testsuite
 # poc_holds_testsuite.run_suite(gen_all_holds)
