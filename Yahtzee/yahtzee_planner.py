@@ -25,9 +25,39 @@ def gen_all_sequences(outcomes, length):
         answer_set = temp_set
     return answer_set
 
+
 def gen_sorted_sequences(outcomes, length):
     all_sequences = gen_all_sequences(outcomes, length)
     sorted_sequences = [tuple(sorted(sequence)) for sequence in all_sequences]
+    return set(sorted_sequences)
+
+
+def gen_limited_sequences(outcomes, length):
+    '''
+    Iterative funciton that enumerates the set of all sequences of
+    outcomes of given length.
+    '''
+    answer_set = set([()])
+    for dummy_idx in range(length):
+        temp_set = set()
+        for partial_sequence in answer_set:
+            for item in outcomes:
+                if item in partial_sequence:
+                    if partial_sequence.count(item) < outcomes.count(item):
+                        new_sequence = list(partial_sequence)
+                        new_sequence.append(item)
+                        temp_set.add(tuple(new_sequence))
+                else:
+                    new_sequence = list(partial_sequence)
+                    new_sequence.append(item)
+                    temp_set.add(tuple(new_sequence))
+        answer_set = temp_set
+    return answer_set
+
+
+def gen_sorted_limited_sequences(outcomes, length):
+    limited_sequences = gen_limited_sequences(outcomes, length)
+    sorted_sequences = [tuple(sorted(sequence)) for sequence in limited_sequences]
     return set(sorted_sequences)
 
 
@@ -75,17 +105,20 @@ def expected_value(held_dice, num_die_sides, num_free_dice):
 
     Returns a floating point expected value
     """
+    print 'held_dice:', held_dice, 'num_die_sides:', num_die_sides, 'num_free_dice:', num_free_dice
     ex_value = 0.0
     outcomes = range(1, num_die_sides + 1)
     sequences = gen_all_sequences(outcomes, num_free_dice)
-    rolls = set([tuple(sorted(sequence)) for sequence in sequences])
-    prob = (1 / float(len(rolls)))
+    rolls = sorted(set([tuple(sorted(sequence)) for sequence in sequences]))
+    # prob = (1 / float(len(rolls)))
     for roll in rolls:
         tmp_dice = list(held_dice)
-        for die in roll:
-            tmp_dice.append(die)
-        ex_value += (score(tmp_dice) * prob)
-    return ex_value
+        tmp_dice.extend(roll)
+        current_score = score(tmp_dice)
+        ex_value += current_score
+        print 'tmp_dice:', tmp_dice, 'current_score:', current_score, 'ex_value:', ex_value
+    print 'ex_value:', ex_value / len(rolls)
+    return ex_value / len(rolls)
 
 
 def gen_all_holds(hand):
@@ -96,8 +129,10 @@ def gen_all_holds(hand):
 
     Returns a set of tuples, where each tuple is dice to hold
     """
-    result = set([()])
-    result.update([((value, ) * hand.count(value)) for value in hand])
+    result = set()
+    result.add(hand)
+    for idx in range(len(hand)):
+        result.update(gen_sorted_limited_sequences(hand, idx))
     return result
 
 
@@ -116,7 +151,7 @@ def strategy(hand, num_die_sides):
     best_value = 0.0
     best_hold = None
     for hold in holds:
-        free_dice = 5 - len(hold)
+        free_dice = len(hand) - len(hold)
         current_value = expected_value(hold, num_die_sides, free_dice)
         if current_value > best_value:
             best_value = current_value
@@ -128,29 +163,49 @@ def run_example():
     """
     Compute the dice to hold and expected score for an example hand
     """
-    outcomes = (1, 1, 2)
+    # print expected_value((5, 5, 6, 6), 6, 1)
+    # print expected_value((5, 6, 6), 6, 2)
+    # print expected_value((6, 6), 6, 3)
+    # print expected_value((5, 6), 6, 3)
+    # print expected_value((), 6, 5)
+    # print strategy((1, ), 6)
+    print expected_value((2, 2), 6, 2)
+    # outcomes = (1, 1, 2)
+    # print 'outcomes: ', outcomes
 
-    seqs = set()
-    for idx in range(len(outcomes)):
-        seqs.update(gen_all_sequences(outcomes, idx))
-    seqs.add(outcomes)
-    print 'seqs:', sorted(seqs)
+    # limited_seq = set()
+    # for idx in range(len(outcomes)):
+    #     limited_seq.update(gen_limited_sequences(outcomes, idx))
+    # limited_seq.add(outcomes)
+    # print 'limited_seq:', sorted(limited_seq)
 
-    sort_seqs = set()
-    sort_seqs.add(outcomes)
-    for idx in range(len(outcomes)):
-        sort_seqs.update(gen_sorted_sequences(outcomes, idx))
-    print 'sort_seqs:', sorted(sort_seqs)
+    # sorted_limited_seq = set()
+    # for idx in range(len(outcomes)):
+    #     sorted_limited_seq.update(gen_sorted_limited_sequences(outcomes, idx))
+    # sorted_limited_seq.add(outcomes)
+    # print 'sorted_limited_seq:', sorted(sorted_limited_seq)
 
-    perms = set()
-    for idx in range(len(outcomes)):
-        perms.update(gen_permutations(outcomes, idx))
-    print 'perms:', sorted(perms)
+    # seqs = set()
+    # for idx in range(len(outcomes)):
+    #     seqs.update(gen_all_sequences(outcomes, idx))
+    # seqs.add(outcomes)
+    # print 'seqs:', sorted(seqs)
 
-    combos = set()
-    for idx in range(len(outcomes)):
-        combos.update(gen_combinations(outcomes, idx))
-    print 'combos:', sorted(combos)
+    # sort_seqs = set()
+    # for idx in range(len(outcomes)):
+    #     sort_seqs.update(gen_sorted_sequences(outcomes, idx))
+    # sort_seqs.add(outcomes)
+    # print 'sort_seqs:', sorted(sort_seqs)
+
+    # perms = set()
+    # for idx in range(len(outcomes)):
+    #     perms.update(gen_permutations(outcomes, idx))
+    # print 'perms:', sorted(perms)
+
+    # combos = set()
+    # for idx in range(len(outcomes)):
+    #     combos.update(gen_combinations(outcomes, idx))
+    # print 'combos:', sorted(combos)
     # num_die_sides = 6
     # hand = (1, 1, 1, 5, 6)
     # hand_score, hold = strategy(hand, num_die_sides)
