@@ -13,7 +13,6 @@ def gen_all_sequences(outcomes, length):
     Iterative function that enumerates the set of all sequences of
     outcomes of given length.
     """
-
     answer_set = set([()])
     for dummy_idx in range(length):
         temp_set = set()
@@ -24,62 +23,6 @@ def gen_all_sequences(outcomes, length):
                 temp_set.add(tuple(new_sequence))
         answer_set = temp_set
     return answer_set
-
-
-def gen_sorted_sequences(outcomes, length):
-    all_sequences = gen_all_sequences(outcomes, length)
-    sorted_sequences = [tuple(sorted(sequence)) for sequence in all_sequences]
-    return set(sorted_sequences)
-
-
-def gen_limited_sequences(outcomes, length):
-    '''
-    Iterative funciton that enumerates the set of all sequences of
-    outcomes of given length.
-    '''
-    answer_set = set([()])
-    for dummy_idx in range(length):
-        temp_set = set()
-        for partial_sequence in answer_set:
-            for item in outcomes:
-                if item in partial_sequence:
-                    if partial_sequence.count(item) < outcomes.count(item):
-                        new_sequence = list(partial_sequence)
-                        new_sequence.append(item)
-                        temp_set.add(tuple(new_sequence))
-                else:
-                    new_sequence = list(partial_sequence)
-                    new_sequence.append(item)
-                    temp_set.add(tuple(new_sequence))
-        answer_set = temp_set
-    return answer_set
-
-
-def gen_sorted_limited_sequences(outcomes, length):
-    limited_sequences = gen_limited_sequences(outcomes, length)
-    sorted_sequences = [tuple(sorted(sequence)) for sequence in limited_sequences]
-    return set(sorted_sequences)
-
-
-def gen_permutations(outcomes, length):
-    answer_set = set([()])
-    for dummy_idx in range(length):
-        temp_set = set()
-        for partial_sequence in answer_set:
-            for item in outcomes:
-                if item in partial_sequence:
-                    continue
-                new_sequence = list(partial_sequence)
-                new_sequence.append(item)
-                temp_set.add(tuple(new_sequence))
-        answer_set = temp_set
-    return answer_set
-
-
-def gen_combinations(outcomes, length):
-    permutations = gen_permutations(outcomes, length)
-    sorted_permutations = [tuple(sorted(sequence)) for sequence in permutations]
-    return set(sorted_permutations)
 
 
 def score(hand):
@@ -105,19 +48,14 @@ def expected_value(held_dice, num_die_sides, num_free_dice):
 
     Returns a floating point expected value
     """
-    print 'held_dice:', held_dice, 'num_die_sides:', num_die_sides, 'num_free_dice:', num_free_dice
     ex_value = 0.0
     outcomes = range(1, num_die_sides + 1)
-    sequences = gen_all_sequences(outcomes, num_free_dice)
-    rolls = sorted(set([tuple(sorted(sequence)) for sequence in sequences]))
-    # prob = (1 / float(len(rolls)))
+    rolls = gen_all_sequences(outcomes, num_free_dice)
     for roll in rolls:
         tmp_dice = list(held_dice)
         tmp_dice.extend(roll)
         current_score = score(tmp_dice)
         ex_value += current_score
-        print 'tmp_dice:', tmp_dice, 'current_score:', current_score, 'ex_value:', ex_value
-    print 'ex_value:', ex_value / len(rolls)
     return ex_value / len(rolls)
 
 
@@ -129,11 +67,23 @@ def gen_all_holds(hand):
 
     Returns a set of tuples, where each tuple is dice to hold
     """
-    result = set()
-    result.add(hand)
-    for idx in range(len(hand)):
-        result.update(gen_sorted_limited_sequences(hand, idx))
-    return result
+    result_set = set()
+    for idx in range(len(hand) + 1):
+        full_set = set([()])
+        for dummy_idx in range(idx):
+            partial_set = set()
+            for partial_sequence in full_set:
+                for item in hand:
+                    if item in partial_sequence and \
+                        partial_sequence.count(item) >= hand.count(item):
+                        continue
+                    else:
+                        new_sequence = list(partial_sequence)
+                        new_sequence.append(item)
+                        partial_set.add(tuple(new_sequence))
+            full_set = partial_set
+        result_set.update(full_set)
+    return set([tuple(sorted(sequence)) for sequence in result_set])
 
 
 def strategy(hand, num_die_sides):
@@ -169,7 +119,7 @@ def run_example():
     # print expected_value((5, 6), 6, 3)
     # print expected_value((), 6, 5)
     # print strategy((1, ), 6)
-    print expected_value((2, 2), 6, 2)
+    # print expected_value((2, 2), 6, 2)
     # outcomes = (1, 1, 2)
     # print 'outcomes: ', outcomes
 
@@ -179,11 +129,7 @@ def run_example():
     # limited_seq.add(outcomes)
     # print 'limited_seq:', sorted(limited_seq)
 
-    # sorted_limited_seq = set()
-    # for idx in range(len(outcomes)):
-    #     sorted_limited_seq.update(gen_sorted_limited_sequences(outcomes, idx))
-    # sorted_limited_seq.add(outcomes)
-    # print 'sorted_limited_seq:', sorted(sorted_limited_seq)
+    # print 'gen_all_holds(hand = (1, 1, 2)):', sorted(gen_all_holds(outcomes))
 
     # seqs = set()
     # for idx in range(len(outcomes)):
@@ -212,7 +158,7 @@ def run_example():
     # print "Best strategy for hand", hand, "is to hold", hold, "with expected score", hand_score
 
 
-run_example()
+# run_example()
 
 # import poc_holds_testsuite
 # poc_holds_testsuite.run_suite(gen_all_holds)

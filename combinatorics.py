@@ -139,8 +139,12 @@ def pascals_triangle(row, cell):
     Returns the value of the given cell
     in the given row of Pascal's triangle
     '''
-    return math.factorial(row) / (math.factorial(cell) *
-                                  math.factorial(abs(row - cell)))
+    return math.factorial(row) / (
+        math.factorial(cell) * math.factorial(abs(row - cell)))
+
+
+print combos(6, 2)
+print sorted(gen_combinations([1, 2, 3, 4, 5, 6], 2))
 
 
 # print enums(2, 2)
@@ -158,9 +162,9 @@ def pascals_triangle(row, cell):
 # print permutation_list
 # print "Answer is", permutation_list[100]
 
-outcome = set(['a', 'b', 'c'])
-permutations = gen_permutations(outcome, 3)
-print permutations
+# outcome = set(['a', 'b', 'c'])
+# permutations = gen_permutations(outcome, 3)
+# print permutations
 
 # print
 # print 'pascals_triangle(row=1, cell=1):', pascals_triangle(1, 1)
